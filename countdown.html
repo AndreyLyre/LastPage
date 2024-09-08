@@ -37,56 +37,53 @@
 
         // Get token from URL parameters
         const token = getQueryParam('token');
-        
+
         if (!token) {
             document.body.innerHTML = '<p>No countdown token provided.</p>';
-            return;
-        }
+        } else {
+            // Retrieve encoded data from sessionStorage
+            const encodedData = sessionStorage.getItem(token);
 
-        // Retrieve encoded data from sessionStorage
-        const encodedData = sessionStorage.getItem(token);
-        
-        if (!encodedData) {
-            document.body.innerHTML = '<p>Invalid countdown token.</p>';
-            return;
-        }
+            if (!encodedData) {
+                document.body.innerHTML = '<p>Invalid countdown token.</p>';
+            } else {
+                // Decode the stored data
+                const decodedData = decodeBase64(encodedData);
+                const countdownData = JSON.parse(decodedData);
 
-        // Decode the stored data
-        const decodedData = decodeBase64(encodedData);
-        const countdownData = JSON.parse(decodedData);
+                const text = countdownData.text;
+                const targetDate = new Date(countdownData.date);
 
-        const text = countdownData.text;
-        const targetDate = new Date(countdownData.date);
+                // Display countdown
+                function updateCountdown() {
+                    const now = new Date();
+                    const timeDifference = targetDate - now;
 
-        // Display countdown
-        function updateCountdown() {
-            const now = new Date();
-            const timeDifference = targetDate - now;
+                    if (timeDifference <= 0) {
+                        // Countdown finished
+                        document.getElementById('countdown').style.display = 'none';
+                        const messageElement = document.getElementById('message');
+                        messageElement.textContent = text;
+                        messageElement.style.display = 'block';
+                        clearInterval(intervalId);
+                    } else {
+                        // Calculate remaining time
+                        const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                        const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
 
-            if (timeDifference <= 0) {
-                // Countdown finished
-                document.getElementById('countdown').style.display = 'none';
-                const messageElement = document.getElementById('message');
-                messageElement.textContent = text;
-                messageElement.style.display = 'block';
-                clearInterval(intervalId);
-                return;
+                        // Display countdown
+                        document.getElementById('countdown').textContent = 
+                            `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    }
+                }
+
+                // Update countdown every second
+                const intervalId = setInterval(updateCountdown, 1000);
+                updateCountdown();
             }
-
-            // Calculate remaining time
-            const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-            // Display countdown
-            document.getElementById('countdown').textContent = 
-                `${days}d ${hours}h ${minutes}m ${seconds}s`;
         }
-
-        // Update countdown every second
-        const intervalId = setInterval(updateCountdown, 1000);
-        updateCountdown();
     </script>
 </body>
 </html>
