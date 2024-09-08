@@ -31,6 +31,7 @@ document.getElementById('countdownForm').addEventListener('submit', function(eve
 
     // Log for debugging
     console.log(`Stored data with token ${token}:`, encodedData);
+    console.log('All sessionStorage data:', sessionStorage);
 
     // Create a unique link for the countdown page
     const countdownLink = `countdown.html?token=${token}`;
