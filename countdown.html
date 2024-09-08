@@ -13,30 +13,38 @@
         #countdown {
             font-size: 2em;
         }
+        #message {
+            display: none;
+            font-size: 2em;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1 id="message"></h1>
     <div id="countdown"></div>
+    <div id="message"></div>
     <script>
         // Get URL parameters
         const params = new URLSearchParams(window.location.search);
         const text = decodeURIComponent(params.get('text'));
         const targetDate = new Date(decodeURIComponent(params.get('date')));
-        
-        // Display text
-        document.getElementById('message').textContent = text;
 
+        // Display countdown
         function updateCountdown() {
             const now = new Date();
             const timeDifference = targetDate - now;
 
             if (timeDifference <= 0) {
-                document.getElementById('countdown').textContent = 'Countdown finished!';
+                // Countdown finished
+                document.getElementById('countdown').style.display = 'none';
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = text;
+                messageElement.style.display = 'block';
                 clearInterval(intervalId);
                 return;
             }
 
+            // Calculate remaining time
             const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
             const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
