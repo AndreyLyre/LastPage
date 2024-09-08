@@ -3,24 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time-Lock Text Viewer</title>
+    <title>Time-Locked Text Viewer</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        textarea { width: 100%; height: 150px; }
-        input { margin-top: 10px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #textContainer {
+            display: none;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #f9f9f9;
+        }
+        #countdown {
+            font-size: 20px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Time-Lock Text Viewer</h1>
-    <div id="formContainer">
-        <textarea id="textInput" placeholder="Enter text here..."></textarea><br>
-        <input type="datetime-local" id="dateTimeInput"><br>
-        <button onclick="saveText()">Save Text</button>
+    <h1>Time-Locked Text Viewer</h1>
+    
+    <div id="setupContainer">
+        <label for="textInput">Enter Text:</label><br>
+        <textarea id="textInput" rows="4" cols="50"></textarea><br><br>
+
+        <label for="dateTimeInput">Select Unlock Date and Time:</label><br>
+        <input type="datetime-local" id="dateTimeInput"><br><br>
+
+        <button onclick="generateLink()">Generate Link</button><br><br>
+
+        <p id="generatedLink"></p>
     </div>
-    <div id="textContainer" style="display:none;">
-        <h2>Your Text:</h2>
-        <p id="displayText"></p>
+
+    <div id="textContainer">
+        <h2>Countdown:</h2>
+        <div id="countdown"></div>
+        <h2>Hidden Text:</h2>
+        <div id="displayText"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
