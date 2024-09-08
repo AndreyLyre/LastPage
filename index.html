@@ -3,25 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown Generator</title>
+    <title>Countdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #countdown {
+            font-size: 2em;
+        }
+        #message {
+            display: none;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Countdown Link Generator</h1>
-    <form id="countdownForm">
-        <label for="text">Text:</label>
-        <input type="text" id="text" name="text" required>
-        <br>
-        <label for="date">Date:</label>
-        <input type="date" id="date" name="date" required>
-        <br>
-        <label for="time">Time:</label>
-        <input type="time" id="time" name="time" required>
-        <br>
-        <button type="submit">Generate Countdown Link</button>
-    </form>
-    <div id="result" style="display: none;">
-        <p>Your countdown link: <a id="countdownLink" href="#" target="_blank">Countdown Link</a></p>
-    </div>
-    <script src="script.js"></script>
+    <div id="countdown"></div>
+    <div id="message"></div>
+    <script>
+        const targetDate = new Date('2024-09-08T20:02:00Z');
+  
+        const obfuscatedText = 'SSBsb3ZlIHlvdQ=='; // Base64 encoded "I love you"
+
+        function updateCountdown() {
+            const now = new Date();
+            const timeDifference = targetDate - now;
+
+            if (timeDifference <= 0) {
+
+                document.getElementById('countdown').style.display = 'none';
+                
+                       const messageElement = document.getElementById('message');
+                const decodedMessage = atob(obfuscatedText);
+                messageElement.textContent = decodedMessage;
+                messageElement.style.display = 'block';
+                clearInterval(intervalId);
+            } else {
+     
+                const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown').textContent = 
+                    `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }
+        }
+
+
+        const intervalId = setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
 </body>
 </html>
