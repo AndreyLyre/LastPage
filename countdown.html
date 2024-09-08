@@ -47,10 +47,12 @@
             if (!encodedData) {
                 document.body.innerHTML = '<p>Invalid countdown token.</p>';
                 console.error('Invalid token or data not found.');
+                console.log('SessionStorage contents:', sessionStorage);
             } else {
                 // Decode the stored data
                 try {
                     const decodedData = decodeBase64(encodedData);
+                    console.log('Decoded data:', decodedData);
                     const countdownData = JSON.parse(decodedData);
 
                     const text = countdownData.text;
