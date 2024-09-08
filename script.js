@@ -1,36 +1,68 @@
-function saveText() {
+function generateLink() {
     const text = document.getElementById('textInput').value;
-    const dateTime = new Date(document.getElementById('dateTimeInput').value);
+    const dateTime = document.getElementById('dateTimeInput').value;
 
     if (text && dateTime) {
-        const expirationTime = dateTime.getTime();
-        localStorage.setItem('savedText', text);
-        localStorage.setItem('expirationTime', expirationTime);
-        alert('Text saved and will be available at the specified time.');
+        const encodedText = encodeURIComponent(text);
+        const encodedTime = encodeURIComponent(dateTime);
+
+        const link = `${window.location.origin}${window.location.pathname}?text=${encodedText}&unlockTime=${encodedTime}`;
+        document.getElementById('generatedLink').innerHTML = `<a href="${link}">Share this link</a>`;
     } else {
-        alert('Please fill in both text and date/time.');
+        alert('Please enter text and select a date/time.');
     }
 }
 
-function checkAvailability() {
-    const savedText = localStorage.getItem('savedText');
-    const expirationTime = localStorage.getItem('expirationTime');
-    const currentTime = new Date().getTime();
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
 
-    if (savedText && expirationTime) {
-        if (currentTime >= expirationTime) {
-            document.getElementById('textInput').style.display = 'none';
-            document.getElementById('dateTimeInput').style.display = 'none';
-            document.getElementById('textContainer').style.display = 'block';
-            document.getElementById('displayText').innerText = savedText;
+function startCountdown(unlockTime) {
+    const countdownElement = document.getElementById('countdown');
+    const targetTime = new Date(unlockTime).getTime();
+
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
+
+        if (distance < 0) {
+            countdownElement.innerHTML = "Unlocked!";
+            document.getElementById('displayText').style.display = 'block';
         } else {
-            document.getElementById('textInput').style.display = 'none';
-            document.getElementById('dateTimeInput').style.display = 'none';
-            document.getElementById('textContainer').style.display = 'none';
-            alert('The text will be available at the specified time.');
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+    };
+
+    updateCountdown(); // Initial call
+    setInterval(updateCountdown, 1000); // Update every second
+}
+
+function checkUnlock() {
+    const text = getUrlParameter('text');
+    const unlockTime = getUrlParameter('unlockTime');
+
+    if (text && unlockTime) {
+        document.getElementById('setupContainer').style.display = 'none';
+        const now = new Date().getTime();
+        const targetTime = new Date(unlockTime).getTime();
+
+        if (now >= targetTime) {
+            document.getElementById('textContainer').style.display = 'block';
+            document.getElementById('displayText').innerText = decodeURIComponent(text);
+            document.getElementById('countdown').innerText = "Unlocked!";
+        } else {
+            document.getElementById('textContainer').style.display = 'block';
+            document.getElementById('displayText').style.display = 'none';
+            startCountdown(unlockTime);
         }
     }
 }
 
-// Run the check on page load
-checkAvailability();
+// Run the unlock check when the page loads
+checkUnlock();
