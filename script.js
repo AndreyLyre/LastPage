@@ -48,7 +48,7 @@ function checkUnlock() {
     const unlockTime = getUrlParameter('unlockTime');
 
     if (text && unlockTime) {
-        document.getElementById('setupContainer').style.display = 'none';
+        document.getElementById('setupContainer').style.display = 'none'; // Hide input fields if URL params exist
         const now = new Date().getTime();
         const targetTime = new Date(unlockTime).getTime();
 
@@ -57,12 +57,4 @@ function checkUnlock() {
             document.getElementById('displayText').innerText = decodeURIComponent(text);
             document.getElementById('countdown').innerText = "Unlocked!";
         } else {
-            document.getElementById('textContainer').style.display = 'block';
-            document.getElementById('displayText').style.display = 'none';
-            startCountdown(unlockTime);
-        }
-    }
-}
-
-// Run the unlock check when the page loads
-checkUnlock();
+            document.getElementById('textContainer').style.display = 'block
