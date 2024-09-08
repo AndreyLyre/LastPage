@@ -24,18 +24,40 @@
     <div id="countdown"></div>
     <div id="message"></div>
     <script>
-        // Get URL parameters
-        const params = new URLSearchParams(window.location.search);
-        const text = decodeURIComponent(params.get('text'));
-        const targetDate = new Date(decodeURIComponent(params.get('date')));
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
 
-        // Display countdown
+        function decodeBase64(encodedData) {
+            return atob(encodedData);
+        }
+
+        const token = getQueryParam('token');
+        
+        if (!token) {
+            document.body.innerHTML = '<p>No countdown token provided.</p>';
+            return;
+        }
+
+        const encodedData = sessionStorage.getItem(token);
+        
+        if (!encodedData) {
+            document.body.innerHTML = '<p>Invalid countdown token.</p>';
+            return;
+        }
+
+        const decodedData = decodeBase64(encodedData);
+        const countdownData = JSON.parse(decodedData);
+
+        const text = countdownData.text;
+        const targetDate = new Date(countdownData.date);
+
         function updateCountdown() {
             const now = new Date();
             const timeDifference = targetDate - now;
 
             if (timeDifference <= 0) {
-                // Countdown finished
                 document.getElementById('countdown').style.display = 'none';
                 const messageElement = document.getElementById('message');
                 messageElement.textContent = text;
@@ -44,7 +66,6 @@
                 return;
             }
 
-            // Calculate remaining time
             const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
             const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
@@ -55,7 +76,7 @@
         }
 
         const intervalId = setInterval(updateCountdown, 1000);
-        updateCountdown(); // Initial call
+        updateCountdown();
     </script>
 </body>
 </html>
