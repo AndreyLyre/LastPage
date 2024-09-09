@@ -1,1 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #e0e0e0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        #countdown-container {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: black;
+            position: absolute;
+            top: 40%;
+            z-index: 1;
+        }
+
+        #countdown {
+            font-size: 3em;
+            margin-top: 10px;
+        }
+
+        #message {
+            display: none;
+            font-size: 1.5em;
+            margin-top: 10px;
+            font-weight: bold;
+            color: black;
+        }
+
+        #progress-bar {
+            width: 70vw;
+            height: 10px;
+            background: #555;
+            border-radius: 5px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+            bottom: 20px;
+        }
+
+        #progress-bar-fill {
+            height: 100%;
+            background: #e0e0e0;
+            width: 0%;
+        }
+
+        .play-button {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: #555;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .play-button svg {
+            fill: #000;
+            width: 24px;
+            height: 24px;
+        }
+
+        .pause-icon {
+            display: none;
+        }
+
+        .pause svg .play-icon {
+            display: none;
+        }
+
+        .pause svg .pause-icon {
+            display: block;
+        }
+
+        #message-content {
+            line-height: 1.6;
+            font-size: 1.2em;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <video id="video-background" autoplay muted loop>
+        <source src="Bgvideo.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div id="countdown-container">
+        <p>The wait is almost over. Check back in:</p>
+        <div id="countdown"></div>
+    </div>
+    <div id="message">
+        <div id="message-content"></div>
+    </div>
+    
+    <div id="progress-bar">
+        <div id="progress-bar-fill"></div>
+    </div>
+    
+    <div class="play-button" id="play-button">
+        <svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet" focusable="false">
+            <g class="play-icon">
+                <path d="M6,4l12,8L6,20V4z"></path>
+            </g>
+            <g class="pause-icon">
+                <rect x="7" y="4" width="3" height="16"></rect>
+                <rect x="14" y="4" width="3" height="16"></rect>
+            </g>
+        </svg>
+    </div>
+
+    <audio id="audio" src="Bgaudio.mp3" autoplay loop></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('audio');
+            const progressBarFill = document.getElementById('progress-bar-fill');
+            const playButton = document.getElementById('play-button');
+            
+            playButton.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play();
+                    playButton.classList.add('pause');
+                } else {
+                    audio.pause();
+                    playButton.classList.remove('pause');
+                }
+            });
+
+            audio.addEventListener('timeupdate', () => {
+                const progress = (audio.currentTime / audio.duration) * 100;
+                progressBarFill.style.width = progress + '%';
+            });
+
+            const targetDate = new Date('2024-09-13T07:00:00Z');
+            const obfuscatedText = 'PHA+SGVsbG8sPC9wPg0KPHA+SWYgeW91JnJzcXVvO3JlIHJlYWRpbmcgdGhpcywgaXQgbWVhbnMgSSBhbSBubyBsb25nZXIgaGVyZSB3aXRoIHlvdS4gSSB3YW50ZWQgdG8gdGFrZSBhIG1vbWVudCB0byBzYXkgdGhhbmsgeW91IGZyb20gdGhlIGJvdHRvbSBvZiBteSBoZWFydCBmb3IgYmVpbmcgdGhlcmUgdGhyb3VnaCBzb21lIG9mIHRoZSBkYXJrZXN0IHRpbWVzIGluIG15IGxpZmUuIFlvdXIgc3VwcG9ydCBoYXMgYmVlbiBhIGd1aWRpbmcgbGlnaHQsIGFuZCBJIGNhbiZyc3F1bzt0IGV4cHJlc3MgaG93IG11Y2ggaXQgbWVhbnQgdG8gbWUuPC9wPg0KPHA+RXZlbiBpbiB0aGUgdG91Z2hlc3QgbW9tZW50cywga25vd2luZyBJIGhhZCBmcmllbmRzIGxpa2UgeW91IGtlcHQgbWUgb3V0IG9mIHRoZSBkYXJrbmVzcy4gWW91ciBwcmVzZW5jZSBtYWRlIGFsbCB0aGUgZGlmZmVyZW5jZSwgYW5kIGZvciB0aGF0LCBJIGFtIGZvcmV2ZXIgZ3JhdGVmdWwuPC9wPg0KPHA+PGk+IkV2ZW4gaWYgd2UmcnNxdW87cmUgbm90IHRvZ2V0aGVyLCBJJnJzcXVvO20gYWx3YXlzIHdpdGggeW91IGluIHlvdXIgaGVhcnQuIiAmbWRhc2g7IE5hcnV0byBVenVtYWtpPC9pPjwvcD4NCjxwPkFzIEkgbGVhdmUgdGhpcyB3b3JsZCwgSSBob3BlIHlvdSBmaW5kIGNvbWZvcnQgaW4gdGhlIG1lbW9yaWVzIHdlIHNoYXJlZCBhbmQgdGhlIGJvbmQgd2UgY3JlYXRlZC4gSGVyZSBhcmUgc29tZSBsaW5rcyB0aGF0IEkgd2FudGVkIHRvIHNoYXJlIHdpdGggeW91LCBob3BpbmcgdGhleSBicmluZyB5b3Ugc29tZSBqb3kgb3IgaW5zcGlyYXRpb246PC9wPg0KPHVsIHN0eWxlPSJsaXN0LXN0eWxlLXR5cGU6IG5vbmU7IHBhZGRpbmc6IDA7IG1hcmdpbjogMDsiPg0KICAgIDxsaT48YSBocmVmPSJodHRwczovL3lvdXR1LmJlLzREeEw2SUttWHg0P3NpPXE4bDF1Njd2bTFOdFZBUDIiIHRhcmdldD0iX2JsYW5rIj5MaW5rIDE8L2E+PC9saT4NCiAgICA8bGk+PGEgaHJlZj0iaHR0cHM6Ly95b3V0dS5iZS9kUXc0dzlXZ1hjUT9zaT1PTEVrdVdXUmg3dTFMS2tZIiB0YXJnZXQ9Il9ibGFuayI+TGluayAyPC9hPjwvbGk+DQogICAgPGxpPjxhIGhyZWY9Imh0dHBzOi8vMWRydi5tcy90L2MvMDEyZGZmM2E2ODJmYjc4Ni9FYXBScVBfVUNkcERwcmpmckx3c3FQSUJnQXRsYVZVRVpjOUNWWlFsS0hKNnlBP2U9aTBwV3dJIiB0YXJnZXQ9Il9ibGFuayI+TGluayAzPC9hPjwvbGk+DQo8L3VsPg0KPHA+VGhhbmsgeW91IG9uY2UgYWdhaW4gZm9yIGV2ZXJ5dGhpbmcuIFRob3VnaCBJIG1heSBiZSBnb25lLCBJJnJzcXVvO2xsIGFsd2F5cyBiZSB3aXRoIHlvdSBpbiBzcGlyaXQuPC9wPg0KPHA+V2l0aCBhbGwgbXkgbG92ZSw8YnI+QW5kcmV5PC9wPg0K';
+
+            function updateCountdown() {
+                const now = new Date();
+                const timeDiff = targetDate - now;
+                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+                if (timeDiff <= 0) {
+                    document.getElementById('countdown-container').style.display = 'none';
+                    document.getElementById('message').style.display = 'block';
+                    document.getElementById('message-content').innerHTML = atob(obfuscatedText);
+                    clearInterval(countdownInterval);
+                } else {
+                    document.getElementById('countdown').innerHTML = 
+                        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+            }
+
+            const countdownInterval = setInterval(updateCountdown, 1000);
+
+            updateCountdown();
+        });
+    </script>
+</body>
+</html>
 
